@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Names with Emails</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <section class="max-w-7xl mx-auto p-8">
+
+        <h1 class="text-3xl font-bold  text-center">
+            Generate Names from Emails
+        </h1>
+        <form action="" class=" mx-auto py-4 px-8 border rounded-xl shadow-lg mt-10">
+            <label for="">Enter Emails Data</label>
+            <textarea id="emails" name="emails" rows="10" cols="50"
+                class="border-2 rounded-lg border-gray-300 p-2 w-full mt-2"></textarea>
+            <button type="submit" id="generateNames" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Generate
+                Names</button>
+        </form>
+
+
+        <button type="submit" id="downloadFile" class="hidden mt-4 bg-blue-500 text-white px-4 py-2 rounded">Download
+            File</button>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+
+
+<script>
+
+    // Initialize a new workbook
+    // and add a sheet for the emails
+    const workbook = XLSX.utils.book_new();
+    workbook.SheetNames.push("Emails");
+
+
+    document.getElementById("downloadFile").addEventListener("click", function (e) {
+        e.preventDefault();
+        XLSX.writeFile(workbook, "emails.xlsx");
+
+    });
+
+    document.getElementById("generateNames").addEventListener("click", function (e) {
+        e.preventDefault();
+        const emails = document.getElementById("emails").value;
+        const names = genNameWithEmails(emails);
+        // console.log(names);
+    });
+
+    const convertStringToArray = (str) => {
+        return str.split("\n").filter(email => email.trim() !== "");
+    }
+
+    const genNameWithEmails = (emails) => {
+        const finalnames = [];
+        if (!emails || emails.length === 0) {
+            window.alert("Please provide some emails to generate names.");
+            return "No emails provided";
+        }
+        const allEmails = Array.isArray(emails) ? emails : convertStringToArray(emails);
+        for (let i = 0; i < allEmails.length; i++) {
+            const userEmail = allEmails[i];
+            const name = allEmails[i] = allEmails[i]?.trim()?.toLowerCase()?.split("@");
+            const last = name[1]?.split(".com");
+            if (name[0] === "info" ||
+                name[0] === "sales" ||
+                name[0] === "contact" ||
+                name[0] === "support" ||
+                name[0] === "office" ||
+                name[0] === "customerservice" ||
+                name[0] === "service") {
+                finalnames.push([last[0], userEmail]);
+
+
+            }
+            else {
+                finalnames.push([name[0], userEmail]);
+            }
+        }
+        window.alert("Names generated successfully!");
+
+        if (finalnames.length > 0) {
+            const downloadFile = document.getElementById("downloadFile");
+            downloadFile.style.display = "block";
+            workbook.Sheets["Emails"] = XLSX.utils.aoa_to_sheet(finalnames);
+        }
+        return finalnames;
+    }
+
+
+
+
+
+
+</script>
+
+</html>
